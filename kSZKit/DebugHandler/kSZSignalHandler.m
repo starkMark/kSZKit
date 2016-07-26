@@ -28,12 +28,9 @@ void SignalHandler(int signal)
   if (exceptionCount > UncaughtExceptionMaximum) {
     return;
   }
-  
   NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:signal] forKey:@"signal"];
-  
   //  创建一个OC异常对象
   NSException *exception = [NSException exceptionWithName:@"SignalExceptionName" reason:[NSString stringWithFormat:@"Signal %d was raised.\n",signal] userInfo:userInfo];
-  
   //  处理异常消息
   [[kSZSignalHandler shareInstance] performSelectorOnMainThread:@selector(handleException:) withObject:exception waitUntilDone:YES];
   
@@ -44,17 +41,12 @@ void HandleException(NSException *exception)
   if (exceptionCount > UncaughtExceptionMaximum) {
     return;
   }
-  
   //  处理异常消息
   [[kSZSignalHandler shareInstance] performSelectorOnMainThread:@selector(handleException:) withObject:exception waitUntilDone:YES];
-  
   NSArray *callStack = [kSZSignalHandler backtrace];
   NSMutableDictionary *userInfo =
   [NSMutableDictionary dictionaryWithDictionary:[exception userInfo]];
-  [userInfo
-   setObject:callStack
-   forKey:UncaughtExceptionHandlerAddressesKey];
-  
+  [userInfo setObject:callStack forKey:UncaughtExceptionHandlerAddressesKey];
   [[[kSZSignalHandler alloc] init]
    performSelectorOnMainThread:@selector(handleException:)
    withObject:
